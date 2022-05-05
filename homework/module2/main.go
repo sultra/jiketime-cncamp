@@ -19,8 +19,8 @@ import (
 )
 
 func main() {
-	flag.Set("v", "4")
-	glog.V(2).Info("http server...")
+	flag.Parse()
+	glog.Info("http server started,port: 8080")
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/healthz", healthz)
 	err := http.ListenAndServe(":8080", nil)
@@ -28,12 +28,13 @@ func main() {
 	if err != nil {
 		glog.Fatal(err)
 	}
+
 }
 
 func healthz(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(200)
 	client_ip := getClientIP(req)
-	glog.V(2).Info("clientIP ,X-Real-Ip : %s ", client_ip)
+	glog.Info("clientIP ", client_ip)
 	io.WriteString(res, "200\n")
 }
 
@@ -41,13 +42,13 @@ func healthz(res http.ResponseWriter, req *http.Request) {
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	glog.Info("root handler")
 	env_str := os.Getenv("VERSION")
-	glog.V(2).Info(env_str)
+	glog.V(2).Info("VERSION: ", env_str)
 	w.Header().Add("sys_version", env_str)
 	for k, v := range r.Header {
 		w.Header().Add(k, v[0])
 	}
 	clientIP := getClientIP(r)
-	glog.V(2).Info("client IP %s", clientIP)
+	glog.Info("client IP: ", clientIP)
 	w.WriteHeader(200)
 	io.WriteString(w, "server root")
 }
@@ -56,11 +57,11 @@ func getClientIP(r *http.Request) string {
 	// 先看header
 	ip := strings.TrimSpace(r.Header.Get("X-Real-Ip"))
 	if ip != "" {
-		glog.V(2).Info("clientIP ,X-Real-Ip : %s ", ip)
+		glog.V(2).Info("clientIP ,X-Real-Ip :", ip)
 		return ip
 	}
 	if ip, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr)); err == nil {
-		glog.V(2).Info("clientIP : %s ", ip)
+		glog.V(2).Info("clientIP :", ip)
 		return ip
 	}
 	return ""
