@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver
+  labels:
+    app: httpserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      imagePullSecrets:
+      - name: hypers-cncamp
+      containers:
+      - name: httpserver
+        image: registry.cn-shanghai.aliyuncs.com/hypers-cncamp/httpserver:v0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT # 请注意这里和 ConfigMap 中的键名是不一样的
+          valueFrom:
+            configMapKeyRef:
+              name: httpserver-config           # 这个值来自 ConfigMap
+              key: port # 需要取值的键
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: httpserver-config
+              key: logLevel
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 3
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - $PORT
+          failureThreshold: 30
+          periodSeconds: 10
+        resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+        volumeMounts:
+        - name: cm01
+          mountPath: "/etc/cm01"
+          readOnly: true
+      volumes:
+      - name: cm01
+        configMap:
+          name: httpserver-config
+          items:
+          - key: "db.config"
+            path: "db.config"

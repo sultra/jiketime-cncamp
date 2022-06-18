@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: httpserver-config
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+  port: "8088"
+  logLevel: "info"
+  configFile:  "db.config"
+
+  # 类文件键
+  db.config: |
+    host: "localhost"
+    type: "mysql"    

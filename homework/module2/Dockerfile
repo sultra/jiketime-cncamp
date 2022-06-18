@@ -1,6 +1,6 @@
 FROM golang:1.18.1-alpine3.15 as build
 WORKDIR $GOPATH/src
-COPY go.mod go.sum homework/module2/*.go ./
+COPY go.mod go.sum *.go ./
 RUN go mod download && \ 
   go build -o $GOPATH/bin/app ./main.go
 
