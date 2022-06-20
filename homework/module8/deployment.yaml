@@ -16,9 +16,11 @@ spec:
     spec:
       imagePullSecrets:
       - name: hypers-cncamp
+      terminationGracePeriodSeconds: 30
       containers:
       - name: httpserver
         image: registry.cn-shanghai.aliyuncs.com/hypers-cncamp/httpserver:v0.1
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         env:

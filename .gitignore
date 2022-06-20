@@ -1,2 +1,5 @@
 .DS_Store
 .vscode
+homework/module8/server-key.pem
+homework/module8/server.csr
+homework/module8/tls.crt
